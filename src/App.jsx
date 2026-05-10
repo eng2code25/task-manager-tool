@@ -1,122 +1,135 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [editorStatus, setEditorStatus] = useState(false);
+  const [inputTask, setInputTask] = useState("");
+  const [priotityTag, setPriorityTag] = useState("urgent");
+  const [statusTag, setStatusTag] = useState("In Progress");
+  const [compiledTask, setCompiledTask] = useState(() => {
+    const saved = localStorage.getItem("task-list");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("task-list", JSON.stringify(compiledTask));
+  }, [compiledTask]);
+
+  const deleteFunction = (deleteIndex) => {
+    const filteredArray = compiledTask.filter(
+      (_, currentIndex) => currentIndex !== deleteIndex,
+    );
+    setCompiledTask(filteredArray);
+  };
+
+  const editFunction = (editIndex) => {
+    if (inputTask !== "") {
+      alert("Please save your task before proceed!");
+      return;
+    }
+
+    setEditorStatus(true);
+
+    const grabTask2Edit = compiledTask[editIndex];
+    setInputTask(grabTask2Edit.taskName);
+    setPriorityTag(grabTask2Edit.priotity);
+    setStatusTag(grabTask2Edit.status);
+
+    deleteFunction(editIndex);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <section>
+      <div>
+        <h1>My Tasks</h1>
+        <button onClick={() => setEditorStatus(!editorStatus)}>
+          + Add tasks
         </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
+        {editorStatus && (
+          <form>
+            <div className="task-input-container">
+              <textarea
+                placeholder="Write your task here..."
+                className="editor"
+                value={inputTask}
+                onChange={(e) => setInputTask(e.target.value)}
+              ></textarea>
+              <div>
+                <select
+                  className="priority-tag"
+                  value={priotityTag}
+                  onChange={(e) => setPriorityTag(e.target.value)}
+                >
+                  <option value="urgent">Urgent</option>
+                  <option value="not-urgent">Not Urgent</option>
+                </select>
+              </div>
+              <div>
+                <select
+                  className="status-tag"
+                  value={statusTag}
+                  onChange={(e) => setStatusTag(e.target.value)}
+                >
+                  <option value="in-progress">In Progress</option>
+                  <option value="not-started">Not Started</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+              <div className="save-btn-container">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const newTask = {
+                      taskName: inputTask,
+                      priotity: priotityTag,
+                      status: statusTag,
+                    };
+                    {
+                      setCompiledTask([...compiledTask, newTask]);
+                    }
+                    setInputTask("");
+                  }}
+                >
+                  Save task
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
+        <div className="task-container">
+          <h2>Task List</h2>
+          <input placeholder="Search task..."></input>
+          <div className="filter-priority-container">
+            <label>Filter By Priority: </label>
+            <select>
+              <option>Urgent</option>
+              <option>Not Urgent</option>
+            </select>
+          </div>
+          <div className="filter-status-container">
+            <label>Filter By Status: </label>
+            <select>
+              <option>In Progress</option>
+              <option>Not Started</option>
+              <option>Completed</option>
+            </select>
+          </div>
+          <ul className="task-summary">
+            {compiledTask.map((item, index) => (
+              <li key={index} className="single-list">
+                <span>{item.taskName}</span>, <span>{item.priotity}</span>,
+                <span>{item.status}</span>
+                <div>
+                  <button onClick={() => deleteFunction(index)}>Delete</button>
+                  <button onClick={() => editFunction(index)}>Edit</button>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      </div>
+    </section>
+  );
 }
 
-export default App
+export default App;
