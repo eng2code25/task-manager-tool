@@ -4,7 +4,7 @@ import "./App.css";
 function App() {
   const [editorStatus, setEditorStatus] = useState(false);
   const [inputTask, setInputTask] = useState("");
-  const [priotityTag, setPriorityTag] = useState("urgent");
+  const [priorityTag, setPriorityTag] = useState("urgent");
   const [statusTag, setStatusTag] = useState("In Progress");
   const [compiledTask, setCompiledTask] = useState(() => {
     const saved = localStorage.getItem("task-list");
@@ -38,6 +38,19 @@ function App() {
     deleteFunction(editIndex);
   };
 
+  const [searchFilter, setSearchFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const filteredTasks = compiledTask.filter((item) => {
+    const matchSearch = item.taskName
+      .toLowerCase()
+      .includes(searchFilter.toLowerCase());
+    const matchPriority =
+      priorityFilter === "all" || item.priority === priorityFilter;
+    const matchStatus = statusFilter === "all" || item.status === statusFilter;
+    return matchSearch && matchPriority && matchStatus;
+  });
+
   return (
     <section>
       <div>
@@ -57,7 +70,7 @@ function App() {
               <div>
                 <select
                   className="priority-tag"
-                  value={priotityTag}
+                  value={priorityTag}
                   onChange={(e) => setPriorityTag(e.target.value)}
                 >
                   <option value="urgent">Urgent</option>
@@ -81,7 +94,7 @@ function App() {
                     e.preventDefault();
                     const newTask = {
                       taskName: inputTask,
-                      priotity: priotityTag,
+                      priority: priorityTag,
                       status: statusTag,
                     };
                     {
@@ -98,26 +111,38 @@ function App() {
         )}
         <div className="task-container">
           <h2>Task List</h2>
-          <input placeholder="Search task..."></input>
+          <input
+            placeholder="Search task..."
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+          ></input>
           <div className="filter-priority-container">
             <label>Filter By Priority: </label>
-            <select>
-              <option>Urgent</option>
-              <option>Not Urgent</option>
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+            >
+              <option value="all">All Priorities</option>
+              <option value="urgent">Urgent</option>
+              <option value="not-urgent">Not Urgent</option>
             </select>
           </div>
           <div className="filter-status-container">
             <label>Filter By Status: </label>
-            <select>
-              <option>In Progress</option>
-              <option>Not Started</option>
-              <option>Completed</option>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">All Progress</option>
+              <option value="in-progress">In Progress</option>
+              <option value="not-started">Not Started</option>
+              <option value="completed">Completed</option>
             </select>
           </div>
           <ul className="task-summary">
-            {compiledTask.map((item, index) => (
+            {filteredTasks.map((item, index) => (
               <li key={index} className="single-list">
-                <span>{item.taskName}</span>, <span>{item.priotity}</span>,
+                <span>{item.taskName}</span>, <span>{item.priority}</span>,
                 <span>{item.status}</span>
                 <div>
                   <button onClick={() => deleteFunction(index)}>Delete</button>
