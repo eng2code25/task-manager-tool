@@ -12,7 +12,8 @@
 }
 
 .status-tag,
-.priority-tag {
+.priority-tag,
+.date-time {
   margin-top: 10px;
 }
 
@@ -25,7 +26,8 @@
 }
 
 .filter-priority-container,
-.filter-status-container {
+.filter-status-container,
+.filter-by-date {
   margin-top: 20px;
 }
 

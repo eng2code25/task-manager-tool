@@ -6,6 +6,7 @@ function App() {
   const [inputTask, setInputTask] = useState("");
   const [priorityTag, setPriorityTag] = useState("urgent");
   const [statusTag, setStatusTag] = useState("In Progress");
+  const [dueDate, setDueDate] = useState("");
   const [compiledTask, setCompiledTask] = useState(() => {
     const saved = localStorage.getItem("task-list");
     return saved ? JSON.parse(saved) : [];
@@ -88,6 +89,13 @@ function App() {
                   <option value="completed">Completed</option>
                 </select>
               </div>
+              <div className="date-time">
+                <input
+                  type="datetime-local"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                ></input>
+              </div>
               <div className="save-btn-container">
                 <button
                   onClick={(e) => {
@@ -96,6 +104,7 @@ function App() {
                       taskName: inputTask,
                       priority: priorityTag,
                       status: statusTag,
+                      dueDate: dueDate,
                     };
                     {
                       setCompiledTask([...compiledTask, newTask]);
@@ -139,11 +148,14 @@ function App() {
               <option value="completed">Completed</option>
             </select>
           </div>
+          <div className="filter-by-date">
+            <label>Filter by Date:</label>
+          </div>
           <ul className="task-summary">
             {filteredTasks.map((item, index) => (
               <li key={index} className="single-list">
                 <span>{item.taskName}</span>, <span>{item.priority}</span>,
-                <span>{item.status}</span>
+                <span>{item.status}</span>, <span>{item.dueDate}</span>
                 <div>
                   <button onClick={() => deleteFunction(index)}>Delete</button>
                   <button onClick={() => editFunction(index)}>Edit</button>
