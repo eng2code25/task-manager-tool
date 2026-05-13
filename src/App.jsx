@@ -148,20 +148,27 @@ function App() {
               <option value="completed">Completed</option>
             </select>
           </div>
-          <div className="filter-by-date">
-            <label>Filter by Date:</label>
-          </div>
           <ul className="task-summary">
-            {filteredTasks.map((item, index) => (
-              <li key={index} className="single-list">
-                <span>{item.taskName}</span>, <span>{item.priority}</span>,
-                <span>{item.status}</span>, <span>{item.dueDate}</span>
-                <div>
-                  <button onClick={() => deleteFunction(index)}>Delete</button>
-                  <button onClick={() => editFunction(index)}>Edit</button>
-                </div>
-              </li>
-            ))}
+            {filteredTasks.map((item, index) => {
+              const isExpired =
+                item.dueDate && new Date(item.dueDate) < new Date();
+              return (
+                <li key={index} className="single-list">
+                  <span style={{ color: isExpired ? "red" : "black" }}>
+                    {item.taskName}
+                    {isExpired && <strong>(EXPIRED)</strong>}
+                  </span>
+                  ,<span>{item.priority}</span>,<span>{item.status}</span>,
+                  <span>{item.dueDate}</span>
+                  <div>
+                    <button onClick={() => deleteFunction(index)}>
+                      Delete
+                    </button>
+                    <button onClick={() => editFunction(index)}>Edit</button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
